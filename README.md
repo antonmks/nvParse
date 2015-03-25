@@ -6,4 +6,6 @@ The purpose of this project is to demonstrate the possibility of parsing CSV fil
  
 Almost instant loading of CSV files allows to significantly accelerate, or, in many cases, totally eliminate the database loading steps and start running the queries as soon as receiving the source data files.
 
-About test.cu file : it parses a 750MB lineitem.tbl file from TPC-H benchmark in about half a second. 
+About test.cu file : it parses a 750MB lineitem.tbl file from TPC-H benchmark in about half a second. You need to have an Nvidia gpu and CUDA software on your machine. You can compile the test file with the following command :
+ 
+nvcc  -O3 -arch=sm_35 -lcuda test.cu -o test
