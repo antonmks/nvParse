@@ -18,7 +18,7 @@ int main() {
 	thrust::host_vector<int> h(3);
 	
 	d[0] = 1;
-	d[1] = 2
+	d[1] = 2;
 	d[2] = 3;
 	
 	thrust::copy(d.begin(), d.end(), h.begin());
