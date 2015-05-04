@@ -45,7 +45,7 @@ As a result we get the needed columns in separate arrays in gpu memory and can c
 
 Hardware : PC with one Intel i3-4130, 16GB of RAM, one 2TB hard drive and GTX Titan
 
-File : 750GB lineitem.tbl text file (6001215 lines)
+File : 750MB lineitem.tbl text file (6001215 lines)
 
 **Parsing 1 field using CPU :**
 
