@@ -41,27 +41,27 @@ As a result we get the needed columns in separate arrays in gpu memory and can c
     thrust::for_each(begin, begin + break_cnt, atoll_ff); 
     
 
-Benchmarks !
+**Benchmarks !**
 
 Hardware : PC with one Intel i3-4130, 16GB of RAM, one 2TB hard drive and GTX Titan
 
 File : 750GB lineitem.tbl text file (6001215 lines)
 
-Parsing 1 field using CPU :
+**Parsing 1 field using CPU :**
 
-$ time cut -d "|" -f 6 lineitem.tbl > /dev/null
+    $ time cut -d "|" -f 6 lineitem.tbl > /dev/null
+    
+    real 0m28.764s
 
-real    0m28.764s
-
-Parsing 11 fields using hand-written program with strtok :
+**Parsing 11 fields using hand-written program with strtok :**
 
 14.5s 
 
-Parsing 11 fields from the same file using GPU :
+**Parsing 11 fields using GPU :**
 
-$ time ./test
-
-real    0m1.736s
+    $ time ./test
+    
+    real 0m1.736s
 
 And the actual gpu parsing part is done in just 0.25 seconds.  
 
