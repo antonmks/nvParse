@@ -14,7 +14,19 @@
 
 int main() {
 
-    FILE* f = fopen("lineitem.tbl", "r" );
+	thrust::device_vector<int> d(3);
+	thrust::host_vector<int> h(3);
+	
+	d[0] = 1;
+	d[1] = 2
+	d[2] = 3;
+	
+	thrust::copy(d.begin(), d.end(), h.begin());
+	
+	for(int i = 0; i < 3; i++)
+	std::cout << h[i] << std::endl;
+	
+    /*FILE* f = fopen("lineitem.tbl", "r" );
     fseek(f, 0, SEEK_END);
     long fileSize = ftell(f);
     thrust::device_vector<char> dev(fileSize);
@@ -142,6 +154,7 @@ int main() {
     std::cout.precision(10);
     for(int i = 0; i < 10; i++)
         std::cout << d_int[i] << std::endl;
+	*/	
 
     return 0;
 
