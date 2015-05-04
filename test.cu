@@ -14,19 +14,7 @@
 
 int main() {
 
-	thrust::device_vector<int> d(3);
-	thrust::host_vector<int> h(3);
-	
-	d[0] = 1;
-	d[1] = 2
-	d[2] = 3;
-	
-	thrust::copy(d.begin(), d.end(), h.begin());
-	
-	for(int i = 0; i < 3; i++)
-	std::cout << h[i] << std::endl;
-	
-    /*FILE* f = fopen("lineitem.tbl", "r" );
+    FILE* f = fopen("lineitem.tbl", "r" );
     fseek(f, 0, SEEK_END);
     long fileSize = ftell(f);
     thrust::device_vector<char> dev(fileSize);
@@ -38,6 +26,7 @@ int main() {
     thrust::copy(buff, buff+fileSize, dev.begin());
     cudaFreeHost(buff);
 
+	std::clock_t start1 = std::clock();
     auto cnt = thrust::count(dev.begin(), dev.end(), '\n');
     std::cout << "There are " << cnt << " total lines in a file" << std::endl;
 
@@ -116,7 +105,6 @@ int main() {
     thrust::device_vector<char> sep(1);
     sep[0] = '|';
 
-    std::clock_t start1 = std::clock();
     thrust::counting_iterator<unsigned int> begin(0);
     parse_functor ff((const char*)thrust::raw_pointer_cast(dev.data()),(char**)thrust::raw_pointer_cast(dest.data()), thrust::raw_pointer_cast(ind.data()),
                      thrust::raw_pointer_cast(ind_cnt.data()), thrust::raw_pointer_cast(sep.data()), thrust::raw_pointer_cast(dev_pos.data()), thrust::raw_pointer_cast(dest_len.data()));
@@ -154,7 +142,7 @@ int main() {
     std::cout.precision(10);
     for(int i = 0; i < 10; i++)
         std::cout << d_int[i] << std::endl;
-	*/	
+		
 
     return 0;
 
