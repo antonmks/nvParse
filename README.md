@@ -21,12 +21,13 @@ This is how the same task can be done using a GPU :
  
     auto break_cnt = thrust::count(d_readbuff.begin(), d_readbuff.end(), '\n');
     thrust::device_vector<int> dev_pos(break_cnt);
-    thrust::copy_if(thrust::make_counting_iterator(0), thrust::make_counting_iterator(bytes_read-1),
+    thrust::copy_if(thrust::make_counting_iterator(0),
+					thrust::make_counting_iterator(bytes_read-1),
     				d_readbuff.begin(), dev_pos.begin(), _1 == '\n');	
 
 The first line counts the number of lines in a buffer (assuming that file is read into memory and copied to gpu buffer d\_readbuff).
 The second line creates a vector in gpu memory that will hold the positions of new line characters.
-The last line compares the characters in a buffer to new line character and, if match is found, copies the position of the character to dev_pos vector. 
+The last line compares the characters in a buffer to new line character and, if a match is found, copies the position of the character to dev_pos vector. 
 
 Now that we know the starting positions of every line in a buffer, we can launch a gpu procedure that will parse the lines using several thousands gpu cores :
 
@@ -44,7 +45,7 @@ Benchmarks !
 
 Hardware : PC with one Intel i3-4130, 16GB of RAM, one 2TB hard drive and GTX Titan
 
-File : 750GB lineitem,tbl text file (6001215 total lines in a file)
+File : 750GB lineitem.tbl text file (6001215 lines)
 
 Parsing 1 field using CPU :
 
@@ -62,7 +63,7 @@ $ time ./test
 
 real    0m1.736s
 
-The actual gpu parsing is done in just 0.25 seconds.  
+And the actual gpu parsing part is done in just 0.25 seconds.  
 
 
  
