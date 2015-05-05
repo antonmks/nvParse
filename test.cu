@@ -14,19 +14,25 @@
 
 int main() {
 
+	std::clock_t start1 = std::clock();
     FILE* f = fopen("lineitem.tbl", "r" );
     fseek(f, 0, SEEK_END);
     long fileSize = ftell(f);
     thrust::device_vector<char> dev(fileSize);
-    fseek(f, 0, SEEK_SET);
-    char* buff;
-    cudaHostAlloc((void**) &buff, fileSize,cudaHostAllocDefault);
-    fread(buff, fileSize, 1, f);
     fclose(f);
-    thrust::copy(buff, buff+fileSize, dev.begin());
-    cudaFreeHost(buff);
+	
+	HANDLE file = CreateFileA("lineitem.tbl", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+    assert(file != INVALID_HANDLE_VALUE);	
+	
+    HANDLE fileMapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
+    assert(fileMapping != INVALID_HANDLE_VALUE);
+ 
+    LPVOID fileMapView = MapViewOfFile(fileMapping, FILE_MAP_READ, 0, 0, 0);
+    auto fileMapViewChar = (const char*)fileMapView;
+    assert(fileMapView != NULL);
+	
+    thrust::copy(fileMapViewChar, fileMapViewChar+fileSize, dev.begin());
 
-	std::clock_t start1 = std::clock();
     auto cnt = thrust::count(dev.begin(), dev.end(), '\n');
     std::cout << "There are " << cnt << " total lines in a file" << std::endl;
 
@@ -110,10 +116,13 @@ int main() {
                      thrust::raw_pointer_cast(ind_cnt.data()), thrust::raw_pointer_cast(sep.data()), thrust::raw_pointer_cast(dev_pos.data()), thrust::raw_pointer_cast(dest_len.data()));
     thrust::for_each(begin, begin + cnt, ff); // now dev_pos vector contains the indexes of new line characters
 
-    thrust::device_vector<long long int> d_int(cnt);
+	std::cout<< "time0 " <<  ( ( std::clock() - start1 ) / (double)CLOCKS_PER_SEC ) << '\n';
+	
+    /*thrust::device_vector<long long int> d_int(cnt);
     thrust::device_vector<double> d_float(cnt);
-    std::cout<< "time0 " <<  ( ( std::clock() - start1 ) / (double)CLOCKS_PER_SEC ) << '\n';
+    
 
+	
     //check the text results in dev_res array :
     for(int i = 0; i < 100; i++)
         std::cout << dev_res9[i];
@@ -143,7 +152,7 @@ int main() {
     for(int i = 0; i < 10; i++)
         std::cout << d_int[i] << std::endl;
 		
-
+    */
     return 0;
 
 }

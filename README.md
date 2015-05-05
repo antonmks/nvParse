@@ -53,7 +53,7 @@ File : 750MB lineitem.tbl text file (6001215 lines)
     
     real 0m28.764s
 
-**Parsing 11 fields using hand-written program with strtok :**
+**Parsing 11 fields using hand-written program with strtok : (no threads, no memory-mapped file)**
 
 14.5s 
 
@@ -61,9 +61,11 @@ File : 750MB lineitem.tbl text file (6001215 lines)
 
     $ time ./test
     
-    real 0m1.736s
+0.77s    
 
 And the actual gpu parsing part is done in just 0.25 seconds.  
+
+P.S. Thanks to Nicolas Guillemot for suggestion on memory-mapping files.
 
 
  
