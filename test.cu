@@ -9,8 +9,12 @@
 #include <windows.h>
 #else
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
 #endif
-
 
 int main() {
 
@@ -21,19 +25,57 @@ int main() {
     thrust::device_vector<char> dev(fileSize);
     fclose(f);
 	
+#ifdef _WIN64
 	HANDLE file = CreateFileA("lineitem.tbl", GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
-    assert(file != INVALID_HANDLE_VALUE);	
-	
+    assert(file != INVALID_HANDLE_VALUE);
+
     HANDLE fileMapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
     assert(fileMapping != INVALID_HANDLE_VALUE);
  
     LPVOID fileMapView = MapViewOfFile(fileMapping, FILE_MAP_READ, 0, 0, 0);
     auto fileMapViewChar = (const char*)fileMapView;
     assert(fileMapView != NULL);
-	
-    thrust::copy(fileMapViewChar, fileMapViewChar+fileSize, dev.begin());
 
-    auto cnt = thrust::count(dev.begin(), dev.end(), '\n');
+    thrust::copy(fileMapViewChar, fileMapViewChar+fileSize, dev.begin());
+#else
+
+    struct stat sb;
+	char *p;
+	int fd;
+
+    fd = open ("lineitem.tbl", O_RDONLY);
+	if (fd == -1) {
+		perror ("open");
+		return 1;
+	}
+
+	if (fstat (fd, &sb) == -1) {
+		perror ("fstat");
+		return 1;
+	}
+
+	if (!S_ISREG (sb.st_mode)) {
+		fprintf (stderr, "%s is not a file\n", "lineitem.tbl");
+		return 1;
+	}
+
+	p = (char*)mmap (0, fileSize, PROT_READ, MAP_SHARED, fd, 0);
+
+	if (p == MAP_FAILED) {
+		perror ("mmap");
+		return 1;
+	}
+
+	if (close (fd) == -1) {
+		perror ("close");
+		return 1;
+	}
+
+	thrust::copy(p, p+fileSize, dev.begin());
+
+#endif
+
+    int cnt = thrust::count(dev.begin(), dev.end(), '\n');
     std::cout << "There are " << cnt << " total lines in a file" << std::endl;
 
     thrust::device_vector<int> dev_pos(cnt+1);
@@ -104,7 +146,6 @@ int main() {
     dest_len[9] = 1;
     dest_len[10] = 10;
 
-
     thrust::device_vector<unsigned int> ind_cnt(1); //fields count
     ind_cnt[0] = 10;
 
@@ -118,11 +159,9 @@ int main() {
 
 	std::cout<< "time0 " <<  ( ( std::clock() - start1 ) / (double)CLOCKS_PER_SEC ) << '\n';
 	
-    /*thrust::device_vector<long long int> d_int(cnt);
+    thrust::device_vector<long long int> d_int(cnt);
     thrust::device_vector<double> d_float(cnt);
     
-
-	
     //check the text results in dev_res array :
     for(int i = 0; i < 100; i++)
         std::cout << dev_res9[i];
@@ -152,7 +191,7 @@ int main() {
     for(int i = 0; i < 10; i++)
         std::cout << d_int[i] << std::endl;
 		
-    */
+
     return 0;
 
 }
